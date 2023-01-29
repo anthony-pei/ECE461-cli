@@ -197,6 +197,14 @@ to quickly create a Cobra application.`,
 		var response GitHubResponse 
 		json.Unmarshal(bodyText, &response)
 
+		// READ from a config file managed by config.go and calculate net score.
+		// Call netscore function (weights[], scores[])
+		// {"url":,"NetScore":,"RampUp":,"Correctness":,"BusFactor","ResponsiveMaintainer","License":}, 
+		// product NDJSON output, build a struct for it
+		// each score is between 0 and 1
+		// exit 0 on success
+
+
 
 		// check out https://api.github.com/repos/anthony-pei/ECE461 for more info
 		// Ramp up: (# of lines of comments / # of lines of total code) / .2 
@@ -215,9 +223,7 @@ to quickly create a Cobra application.`,
 		// License
 		// response.license.name or .key, create a table of valid licenses
 
-		// Call netscore function (weights[], scores[])
-
-		// print url + netscore
+	
 	},
 }
 
