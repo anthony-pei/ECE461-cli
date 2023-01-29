@@ -1,9 +1,9 @@
 package metrics
 
-type metric interface {
-	calculate(m module) float64
+type Metric interface {
+	Calculate(m Module) float64
 }
 
-type module interface {
-	get_github_url() string
+type Module interface {
+	GetGitHubUrl() string
 }

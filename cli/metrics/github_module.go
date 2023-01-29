@@ -1,9 +1,9 @@
 package metrics
 
-type github_module struct {
-	url string
+type GitHubModule struct {
+	Url string
 }
 
-func (g github_module) get_url() string {
-	return g.url
+func (g GitHubModule) GetGitHubUrl() string {
+	return g.Url
 }
