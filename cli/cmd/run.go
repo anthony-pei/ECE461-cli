@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/anthony-pei/ECE461/cli/metrics"
 	"github.com/spf13/cobra"
 )
 
@@ -16,8 +17,14 @@ var runCmd = &cobra.Command{
 	Short: "",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(args[0])
-		// Read line by line file in go
+		git_url := args[0]
+		fmt.Println(git_url)
+		g := metrics.GitHubModule{
+			Url: git_url,
+		}
+		m := metrics.LicenseMetric{}
+		m.Calculate(g)
+		// TODO: Read line by line file in go
 	},
 }
 
