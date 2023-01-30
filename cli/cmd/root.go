@@ -152,6 +152,7 @@ type GitHubResponse struct {
 	SubscribersCount int `json:"subscribers_count"`
 }
 
+// MOVE THIS TO UTILITY
 func getEnvVar(key string) string {
 	err := godotenv.Load(".env")
   if err != nil {
@@ -163,18 +164,17 @@ func getEnvVar(key string) string {
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-
+	Short: `Run takes GitHub and npmjs URLs as input and outputs NDJSON containing the URL, NetScore, and various metrics`,
+	Long: `
+	
+Run is a CLI program written in Go. Its core function is to evaluate GitHub repositories and npm modules.
+Execute ./run <url_string> and the program will output a NDJSON containing the repository URL, a NetScore, 
+and various metrics such as RampUp, Correctness, BusFactor, ResponsiveMaintainer, LicenseScore, etc. The 
+metrics and weights can be configured through ./run config.`,
+	Args: cobra.ExactArgs(1),
 	// test with go run main.go -- https://api.github.com/repos/anthony-pei/ECE461
 	Run: func(cmd *cobra.Command, args []string) { 
+
 		client := &http.Client{}
 		req, err := http.NewRequest("GET", args[0], nil)
 		if err != nil {
@@ -196,7 +196,7 @@ to quickly create a Cobra application.`,
 
 		var response GitHubResponse 
 		json.Unmarshal(bodyText, &response)
-
+		
 		// READ from a config file managed by config.go and calculate net score.
 		// Call netscore function (weights[], scores[])
 		// {"url":,"NetScore":,"RampUp":,"Correctness":,"BusFactor","ResponsiveMaintainer","License":}, 
@@ -212,9 +212,10 @@ to quickly create a Cobra application.`,
 
 		// Correctness 1 - (# of issues / # of stars)
 		fmt.Printf("star count: %v\n", response.StargazersCount) // check issues_url
-		fmt.Printf("open issues count: %v\n", response.open_issues_count)
+		fmt.Printf("open issues count: %v\n", response.OpenIssuesCount)
+		os.Exit(0)
 
-		// Bus Factor: 1 - (1 / (# of contributors)) 
+			// Bus Factor: 1 - (1 / (# of contributors)) 
 		// response.contributors_url + count 
 
 		// Responsiveness: 1 - .01 * (open time (days) of last 10 closed issues)
@@ -222,8 +223,7 @@ to quickly create a Cobra application.`,
 
 		// License
 		// response.license.name or .key, create a table of valid licenses
-
-	
+		
 	},
 }
 
@@ -245,7 +245,8 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Example = `  cli [url_string]`
 }
 
 
