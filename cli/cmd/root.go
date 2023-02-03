@@ -1,6 +1,5 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -16,6 +15,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+=======
 type GitHubResponse struct {
 	ID       int    `json:"id"`
 	NodeID   string `json:"node_id"`
@@ -160,7 +160,6 @@ func getEnvVar(key string) string {
   }
 	return os.Getenv(key)
 }
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cli",
@@ -248,5 +247,3 @@ func init() {
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.Example = `  cli [url_string]`
 }
-
-
