@@ -156,6 +156,17 @@ type GitHubResponse struct {
 	SubscribersCount int `json:"subscribers_count"`
 }
 
+type Output struct {
+	URL string `json:"url"`
+	NetScore float64 `json:"net_score"`
+	RampUp float64 `json:"ramp_up"`
+	Correctness float64 `json:"correctness"`
+	BusFactor float64 `json:"bus_factor"`
+	ResponsiveMaintainer float64 `json:"responsive_maintainer"`
+	License float64 `json:"license"`
+}
+
+
 // MOVE THIS TO UTILITY
 func getEnvVar(key string) string {
 	err := godotenv.Load(".env")
@@ -181,6 +192,8 @@ metrics and weights can be configured through ./run config.`,
 		parts := strings.Split(args[0], "/")
 
 		url := args[0] 	// https://www.npmjs.com/package/browserify
+
+		// if npmjs link, find GitHub repo. ADD message for npm modules with no GitHub repo
 		if parts[2] == "www.npmjs.com" {
 			packageName := parts[len(parts)-1]
 			resp, err := http.Get("https://registry.npmjs.org/" + packageName)
@@ -201,12 +214,8 @@ metrics and weights can be configured through ./run config.`,
 			homepage := pkg.Homepage
 			url = strings.Split(homepage, "#")[0]
 		} 
-		
-		fmt.Println(url)
-		os.Exit(0)
 
-
-		
+		// process GitHub repo
 		client := &http.Client{}
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
@@ -228,7 +237,28 @@ metrics and weights can be configured through ./run config.`,
 
 		var response GitHubResponse 
 		json.Unmarshal(bodyText, &response)
-		
+
+		// COMPUTE METRICS
+
+
+		// OUTPUT NDJSON
+		repos := []Output{
+			{URL: "John Doe", NetScore: 1, RampUp: 1, Correctness: 1, BusFactor: 1, ResponsiveMaintainer: 1, License: 1},
+		}
+
+		for _, repo := range repos {
+			b, err := json.Marshal(repo)
+			if err != nil {
+				fmt.Println("Error:", err)
+				return
+			}
+			_, err = fmt.Fprintln(os.Stdout, string(b))
+			if err != nil {
+				fmt.Println("Error:", err)
+				return
+			}
+		}
+		os.Exit(0)
 		// READ from a config file managed by config.go and calculate net score.
 		// Call netscore function (weights[], scores[])
 		// {"url":,"NetScore":,"RampUp":,"Correctness":,"BusFactor","ResponsiveMaintainer","License":}, 
