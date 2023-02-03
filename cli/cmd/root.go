@@ -165,28 +165,6 @@ func getEnvVar(key string) string {
 	return os.Getenv(key)
 }
 
-func getGitHubFromNpm(url string, packageName string) string {
-	resp, err := http.Get("https://registry.npmjs.org/" + packageName)
-	if err != nil {
-		// handle err
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var pkg Package
-	err = json.Unmarshal(body, &pkg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	homepage := pkg.Homepage
-	fmt.Println("Homepage:", homepage)
-	return string(homepage)
-}
-
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cli",
@@ -202,13 +180,33 @@ metrics and weights can be configured through ./run config.`,
 	Run: func(cmd *cobra.Command, args []string) { 
 		parts := strings.Split(args[0], "/")
 
-		url := args[0]
+		url := args[0] 	// https://www.npmjs.com/package/browserify
 		if parts[2] == "www.npmjs.com" {
-			url = getGitHubFromNpm(args[0], parts[len(parts)-1])
+			packageName := parts[len(parts)-1]
+			resp, err := http.Get("https://registry.npmjs.org/" + packageName)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer resp.Body.Close()
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			var pkg Package
+			err = json.Unmarshal(body, &pkg)
+			if err != nil {
+				log.Fatal(err)
+			}
+			homepage := pkg.Homepage
+			url = strings.Split(homepage, "#")[0]
 		} 
 		
-		fmt.Printf(url)
+		fmt.Println(url)
 		os.Exit(0)
+
+
+		
 		client := &http.Client{}
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
