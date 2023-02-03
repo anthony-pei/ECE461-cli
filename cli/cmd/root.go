@@ -10,12 +10,16 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 	"net/http"
 	"github.com/spf13/cobra"
 	"github.com/joho/godotenv"
 )
 
-=======
+type Package struct {
+	Homepage string `json:"homepage"`
+}
+
 type GitHubResponse struct {
 	ID       int    `json:"id"`
 	NodeID   string `json:"node_id"`
@@ -160,6 +164,29 @@ func getEnvVar(key string) string {
   }
 	return os.Getenv(key)
 }
+
+func getGitHubFromNpm(url string, packageName string) string {
+	resp, err := http.Get("https://registry.npmjs.org/" + packageName)
+	if err != nil {
+		// handle err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var pkg Package
+	err = json.Unmarshal(body, &pkg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	homepage := pkg.Homepage
+	fmt.Println("Homepage:", homepage)
+	return string(homepage)
+}
+
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cli",
@@ -173,9 +200,17 @@ metrics and weights can be configured through ./run config.`,
 	Args: cobra.ExactArgs(1),
 	// test with go run main.go -- https://api.github.com/repos/anthony-pei/ECE461
 	Run: func(cmd *cobra.Command, args []string) { 
+		parts := strings.Split(args[0], "/")
 
+		url := args[0]
+		if parts[2] == "www.npmjs.com" {
+			url = getGitHubFromNpm(args[0], parts[len(parts)-1])
+		} 
+		
+		fmt.Printf(url)
+		os.Exit(0)
 		client := &http.Client{}
-		req, err := http.NewRequest("GET", args[0], nil)
+		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
