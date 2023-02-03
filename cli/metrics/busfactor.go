@@ -2,10 +2,12 @@ package metrics
 
 import "fmt"
 
-type LicenseMetric struct {
+// Bus Factor: 1 - (1 / (# of contributors))
+type BusFactorMetric struct {
+	numContributors float64
 }
 
-func (l LicenseMetric) CalculateScore(m Module) float64 {
+func (l BusFactorMetric) CalculateScore(m Module) float64 {
 	// Object l of type license matrix and m of type module with function get_url()\
 	fmt.Println("Calculating license metric for module:", m.GetGitHubUrl())
 	return 0.0

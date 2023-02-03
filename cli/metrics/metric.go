@@ -1,7 +1,9 @@
 package metrics
 
+// Score must be between [0, 1]
+// limit API calls.
 type Metric interface {
-	Calculate(m Module) float64
+	CalculateScore(m Module) float64
 }
 
 type Module interface {
