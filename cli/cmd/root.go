@@ -7,6 +7,7 @@ import (
 	"time"
 	"encoding/json"
 	"os"
+	"bufio"
 	"fmt"
 	"io"
 	"log"
@@ -15,9 +16,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/joho/godotenv"
 )
-
-type Package struct {
-	Homepage string `json:"homepage"`
+type NPMResponse struct {
+	Repository struct {
+		Type string `json:"type"`
+		URL  string `json:"url"`
+	} `json:"repository"`
 }
 
 type GitHubResponse struct {
@@ -166,8 +169,48 @@ type Output struct {
 	License float64 `json:"license"`
 }
 
+// get links for file
+// input: string of URL_file
+// output array of url strings
+func getLinksFromFile(fileName string) ([]string, error) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var links []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		links = append(links, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return links, nil
+}
+
+// function for npm links
+
+// function for Github repos
+
+
+// function for metrics
+
+// function for ndjson
+
+
 
 // MOVE THIS TO UTILITY
+func toNDJson(url string, ns float64, ru float64, c float64, bf float64, rm float64, l float64)(string, error) {
+	j := Output{URL: url, NetScore: ns, RampUp: ru, Correctness: c, BusFactor: bf, ResponsiveMaintainer: rm, License: l}
+	b, err := json.Marshal(j)
+	if err != nil {
+		log.Fatal("Error with NDJson conversion")
+	}
+	return string(b), nil
+}
+
 func getEnvVar(key string) string {
 	err := godotenv.Load(".env")
   if err != nil {
@@ -189,75 +232,81 @@ metrics and weights can be configured through ./run config.`,
 	Args: cobra.ExactArgs(1),
 	// test with go run main.go -- https://api.github.com/repos/anthony-pei/ECE461
 	Run: func(cmd *cobra.Command, args []string) { 
-		parts := strings.Split(args[0], "/")
+		links, err := getLinksFromFile(args[0])
+		if err != nil {
+			log.Fatal("error opening input file")
+			os.Exit(1)
+		}
 
-		url := args[0] 	// https://www.npmjs.com/package/browserify
+		for _, link := range links {
+			parts := strings.Split(link, "/")
+			url := link	// https://www.npmjs.com/package/browserify
 
-		// if npmjs link, find GitHub repo. ADD message for npm modules with no GitHub repo
-		if parts[2] == "www.npmjs.com" {
-			packageName := parts[len(parts)-1]
-			resp, err := http.Get("https://registry.npmjs.org/" + packageName)
+			// if npmjs link, find GitHub repo. ADD message for npm modules with no GitHub repo
+			if parts[2] == "www.npmjs.com" {
+				packageName := parts[len(parts)-1]
+				resp, err := http.Get("https://registry.npmjs.org/" + packageName)
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer resp.Body.Close()
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				var npmResp NPMResponse
+				err = json.Unmarshal(body, &npmResp)
+				if err != nil {
+					log.Fatal(err)
+				}
+				url = npmResp.Repository.URL
+				url = "https://" + strings.Split(url, "//")[1]
+				url = url[:len(url)-4] // removes .git
+			} 
+
+			github_parts := strings.Split(url, "/")
+			github_api_url := "https://api.github.com/repos/" + github_parts[len(github_parts)-2] + "/" + github_parts[len(github_parts)-1]
+
+		
+			// process GitHub repo
+			client := &http.Client{}
+			req, err := http.NewRequest("GET", github_api_url, nil)
+			if err != nil {
+				log.Fatal(err)
+			}
+			req.Header.Set("Accept", "application/vnd.github+json")
+			req.Header.Set("Authorization", "Bearer " + getEnvVar("PERSONAL_TOKEN"))
+			req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
+			resp, err := client.Do(req)
 			if err != nil {
 				log.Fatal(err)
 			}
 			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
+			
+			bodyText, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			var pkg Package
-			err = json.Unmarshal(body, &pkg)
-			if err != nil {
-				log.Fatal(err)
-			}
-			homepage := pkg.Homepage
-			url = strings.Split(homepage, "#")[0]
-		} 
+			var response GitHubResponse 
+			json.Unmarshal(bodyText, &response)
 
-		// process GitHub repo
-		client := &http.Client{}
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
-		req.Header.Set("Accept", "application/vnd.github+json")
-		req.Header.Set("Authorization", "Bearer " + getEnvVar("PERSONAL_TOKEN"))
-		req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer resp.Body.Close()
-		
-		bodyText, err := io.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var response GitHubResponse 
-		json.Unmarshal(bodyText, &response)
-
-		// COMPUTE METRICS
-
-
-		// OUTPUT NDJSON
-		repos := []Output{
-			{URL: "John Doe", NetScore: 1, RampUp: 1, Correctness: 1, BusFactor: 1, ResponsiveMaintainer: 1, License: 1},
-		}
-
-		for _, repo := range repos {
-			b, err := json.Marshal(repo)
+			
+				// COMPUTE METRICS
+			correctScore := 1.0 - (0.000001 + (float64(response.OpenIssuesCount) / float64(response.StargazersCount)))
+			j, err :=  toNDJson(link, 1.0, 1.0, correctScore, 1.0, 1.0, 1.0)
 			if err != nil {
 				fmt.Println("Error:", err)
 				return
 			}
-			_, err = fmt.Fprintln(os.Stdout, string(b))
+			_, err = fmt.Fprintln(os.Stdout, j)
 			if err != nil {
 				fmt.Println("Error:", err)
 				return
 			}
 		}
+	
 		os.Exit(0)
 		// READ from a config file managed by config.go and calculate net score.
 		// Call netscore function (weights[], scores[])
@@ -273,9 +322,9 @@ metrics and weights can be configured through ./run config.`,
 		// check contents_url, comments_url
 
 		// Correctness 1 - (# of issues / # of stars)
-		fmt.Printf("star count: %v\n", response.StargazersCount) // check issues_url
-		fmt.Printf("open issues count: %v\n", response.OpenIssuesCount)
-		os.Exit(0)
+		// fmt.Printf("star count: %v\n", response.StargazersCount) // check issues_url
+		// fmt.Printf("open issues count: %v\n", response.OpenIssuesCount)
+		// os.Exit(0)
 
 			// Bus Factor: 1 - (1 / (# of contributors)) 
 		// response.contributors_url + count 
