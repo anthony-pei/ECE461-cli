@@ -21,9 +21,9 @@ var runCmd = &cobra.Command{
 		names := file_handler.GetOwnersNamesFromFile(args[0]) // Not error checking file name
 		modules := github_util.GetGithubModules(names)
 		for _, module := range modules {
-			netscoreModule := metrics.NetScoreMetric{}
-			netscore := netscoreModule.CalculateScore(module)
-			fmt.Println(netscore)
+			netscoreModule := metrics.NetScoreMetric{URL: module.GetGitHubUrl()}
+			netscoreModule.CalculateScore(module)
+			fmt.Println(netscoreModule.ToNDJson())
 		}
 	},
 }
