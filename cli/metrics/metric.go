@@ -8,4 +8,9 @@ type Metric interface {
 
 type Module interface {
 	GetGitHubUrl() string
+	GetLicense() string
+	GetOpenIssuesCount() int
+	GetStargazerCount() int
+	GetContributorCount() int
+	GetName() string
 }
