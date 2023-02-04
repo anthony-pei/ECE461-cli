@@ -16,7 +16,7 @@ type OwnerName struct {
 	Url   string
 }
 
-// TODO: Move into github_module.go Need to make it global
+// TODO: Handle recieving errors from github API, no need to panic move on to next OwnerName (log issue)
 func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 	res := []metrics.Module{}
 	ctx := context.Background()
