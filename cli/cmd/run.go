@@ -5,23 +5,15 @@ package cmd
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
+	"github.com/anthony-pei/ECE461/cli/github_util"
 	"github.com/anthony-pei/ECE461/cli/metrics"
-	"github.com/google/go-github/github"
 	"github.com/spf13/cobra"
-	"golang.org/x/oauth2"
 )
-
-type ownerName struct {
-	Owner string
-	Name  string
-	Url   string
-}
 
 func calcNetScore(modules []metrics.Module) {
 	correctnessMetric := metrics.CorrectnessMetric{}
@@ -36,59 +28,34 @@ func calcNetScore(modules []metrics.Module) {
 
 }
 
-func getOwnersNamesFromFile(filename string) []ownerName {
+func getOwnersNamesFromFile(filename string) []github_util.OwnerName {
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	var ownerNames []ownerName
+	var ownerNames []github_util.OwnerName
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		link := scanner.Text()
 		parts := strings.Split(link, "/")
 		if parts[2] != "www.npmjs.com" {
-			ownerNames = append(ownerNames, ownerName{Owner: parts[3], Name: parts[4], Url: link})
+			ownerNames = append(ownerNames, github_util.OwnerName{Owner: parts[3], Name: parts[4], Url: link})
 		}
 	}
 	return ownerNames
-}
-
-// TODO: Move into github_module.go Need to make it global
-func getGithubModules(ownerNames []ownerName) []metrics.Module {
-	res := []metrics.Module{}
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	client := github.NewClient(tc)
-
-	for _, on := range ownerNames {
-		repos, _, err := client.Repositories.Get(ctx, on.Owner, on.Name)
-		if err != nil {
-			log.Panic(err)
-		}
-		contributorStats, _, err := client.Repositories.ListContributorsStats(ctx, on.Owner, on.Name)
-		if err != nil {
-			log.Panic(err)
-		}
-		module := metrics.GitHubModule{Repo: repos, ContributorStats: contributorStats, Url: on.Url}
-		res = append(res, module)
-	}
-	return res
 }
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "A brief description of your command",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		names := getOwnersNamesFromFile(args[0])
-		modules := getGithubModules(names)
+		names := getOwnersNamesFromFile(args[0]) // Not error checking file name
+		modules := github_util.GetGithubModules(names)
 		calcNetScore(modules)
 	},
 }

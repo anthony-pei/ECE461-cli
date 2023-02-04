@@ -1,4 +1,4 @@
-package metrics
+package github_util
 
 import "github.com/google/go-github/github"
 
