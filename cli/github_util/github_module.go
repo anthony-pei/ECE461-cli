@@ -3,9 +3,9 @@ package github_util
 import "github.com/google/go-github/github"
 
 type GitHubModule struct {
-	Url              string
-	Repo             *github.Repository
-	ContributorStats []*github.ContributorStats
+	Url          string
+	Repo         *github.Repository
+	Contributors []*github.Contributor
 }
 
 func (g GitHubModule) GetGitHubUrl() string {
@@ -26,7 +26,7 @@ func (g GitHubModule) GetStargazerCount() int {
 }
 
 func (g GitHubModule) GetContributorCount() int {
-	return len(g.ContributorStats)
+	return len(g.Contributors)
 }
 
 func (g GitHubModule) GetName() string {

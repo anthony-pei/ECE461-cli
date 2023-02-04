@@ -32,12 +32,15 @@ func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 		if err != nil {
 			log.Panic(err)
 		}
-		contributorStats, _, err := client.Repositories.ListContributorsStats(ctx, on.Owner, on.Name)
+		contributors, _, err := client.Repositories.ListContributors(ctx, on.Owner, on.Name, nil)
+		// Can create error with contributor stats and umarshalling, not consistent
 		if err != nil {
 			log.Panic(err)
+		} else {
+			module := GitHubModule{Repo: repos, Contributors: contributors, Url: on.Url}
+			res = append(res, module)
 		}
-		module := GitHubModule{Repo: repos, ContributorStats: contributorStats, Url: on.Url}
-		res = append(res, module)
+
 	}
 	return res
 }
