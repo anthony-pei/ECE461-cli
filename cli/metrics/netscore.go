@@ -23,7 +23,7 @@ var busfactorMetric BusFactorMetric
 var rampUpMetric RampUpMetric
 var responsivnessMetric ResponsiveMaintainerMetric
 
-func (l NetScoreMetric) CalculateScore(m Module) float64 {
+func (l *NetScoreMetric) CalculateScore(m Module) float64 {
 	// Object l of type license matrix and m of type module with function get_url()
 
 	fmt.Println(m.GetName())
@@ -34,12 +34,13 @@ func (l NetScoreMetric) CalculateScore(m Module) float64 {
 	l.Responsiveness = responsivnessMetric.CalculateScore(m)
 
 	l.Netscore = 0.4*l.Responsiveness + 0.1*l.Rampup + 0.2*l.Busfactor + 0.2*l.License + 0.1*l.Correctness
-	fmt.Println("Calculating Netscore metric for module:", m.GetGitHubUrl())
+	log.Println("Calculating Netscore metric for module:", m.GetGitHubUrl())
 	return l.Netscore
 }
 
 func (l NetScoreMetric) ToNDJson() string {
 	b, err := json.Marshal(l)
+	fmt.Println(l.Netscore)
 	if err != nil {
 		log.Fatal("Error with NDJson conversion")
 	}
