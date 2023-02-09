@@ -4,8 +4,8 @@ subdir="cli"
 
 cd "$subdir"
 if [[ "$1" == "build" ]]; then
-  go install
-  echo "build"
+  go build
+  echo "built cli program"
 elif [[ "$1" == "install" ]]; then
   echo "install dependencies"
 elif [[ "$1" == "test" ]]; then
