@@ -12,5 +12,5 @@ elif [[ "$1" == "test" ]]; then
   echo "running tests"
 elif [[ -n "$1" ]]; then
   echo "checking URL"
-  cli input.txt
+  cli "$1"
 fi
