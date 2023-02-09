@@ -1,6 +1,11 @@
 package github_util
 
-import "github.com/google/go-github/github"
+import (
+	"log"
+	"os/exec"
+
+	"github.com/google/go-github/github"
+)
 
 type GitHubModule struct {
 	Url          string
@@ -31,4 +36,12 @@ func (g GitHubModule) GetContributorCount() int {
 
 func (g GitHubModule) GetName() string {
 	return g.Repo.GetFullName()
+}
+
+func (g GitHubModule) Clone(dir string) {
+	cmd := exec.Command("git", "clone", *g.Repo.CloneURL, dir)
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err) // Maybe no need to be Fatal?
+	}
 }
