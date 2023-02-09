@@ -1,9 +1,9 @@
 package metrics
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 
@@ -13,23 +13,34 @@ import (
 type RampUpMetric struct {
 }
 
+var analyzeDirFunction = analyzeDir
+
 func (l RampUpMetric) CalculateScore(m Module) float64 {
 	// Object l of type license matrix and m of type module with function get_url()
-
+	log.Println("Calculating ramp up metric for module:", m.GetGitHubUrl())
 	dir := "temp"
-	os.RemoveAll(dir)
-
+	cleanDir(dir, false)
 	m.Clone(dir)
-	processor.ProcessConstants() // Required to load the language information and need only be done once
-	_, code, comments, _ := analyzeDir(dir)
+	processor.ProcessConstants()                    // Required to load the language information and need only be done once
+	_, code, comments, _ := analyzeDirFunction(dir) // Returns total lines, lines of code, comments, and blank lines. Not using first and last at the moment
+	log.Printf("Code Lines: %v, Comment Lines: %v", code, comments)
+	cleanDir(dir, true)
 
+	if code == 0 {
+		return 0.0
+	}
+	score := float64(comments) / float64(code) / 0.2
+	score = math.Min(score, 1)
+	score = math.Max(score, 0)
+	return score
+}
+
+func cleanDir(dir string, failOnError bool) {
 	err := os.RemoveAll(dir)
-	if err != nil {
+
+	if failOnError && (err != nil) {
 		log.Fatal(err)
 	}
-	log.Println("Calculating ramp up metric for module:", m.GetGitHubUrl())
-	fmt.Println(float64(comments) / float64(code) / 0.2)
-	return float64(comments) / float64(code) / 0.2
 }
 
 func analyzeDir(dir string) (int64, int64, int64, int64) {
