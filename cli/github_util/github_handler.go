@@ -20,8 +20,16 @@ type OwnerName struct {
 func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 	res := []metrics.Module{}
 	ctx := context.Background()
+	token, has_token := os.LookupEnv("GITHUB_TOKEN")
+	if !has_token {
+		log.Fatal("GITHUB_TOKEN variable not in environment, please set it in enviroment variables")
+	}
+	if len(token) == 0 {
+		log.Fatal("GITHUB_TOKEN variable is present, but not set to a value")
+	}
+
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+		&oauth2.Token{AccessToken: token},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
