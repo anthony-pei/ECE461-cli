@@ -10,5 +10,10 @@ type BusFactorMetric struct {
 func (l BusFactorMetric) CalculateScore(m Module) float64 {
 	// Object l of type license matrix and m of type module with function get_url()\
 	fmt.Println("Calculating busFactor metric for module:", m.GetGitHubUrl())
-	return 0.0
+	numContributors := float64(m.GetContributorCount())
+	if numContributors == 0 {
+		return 0.0
+	}
+	busFactor := 1.0 - (1.0 / numContributors)
+	return busFactor
 }
