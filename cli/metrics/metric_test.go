@@ -49,6 +49,16 @@ func TestRampUpNoComments(t *testing.T) {
 	}
 	assertEquals(t, "", rampUpMetric.CalculateScore(m), 0.0)
 }
+func TestRampUpEqualCommentsCode(t *testing.T) {
+	m := MockModule{}
+	rampUpMetric := RampUpMetric{}
+
+	analyzeDirFunction = func(dir string) (int64, int64, int64, int64) {
+		return 0, 100, 100, 0
+	}
+	assertEquals(t, "", rampUpMetric.CalculateScore(m), 1.0)
+}
+
 func TestRampUpNoCode(t *testing.T) {
 	m := MockModule{}
 	rampUpMetric := RampUpMetric{}
