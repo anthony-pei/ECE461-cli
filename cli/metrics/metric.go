@@ -13,4 +13,5 @@ type Module interface {
 	GetStargazerCount() int
 	GetContributorCount() int
 	GetName() string
+	Clone(string)
 }
