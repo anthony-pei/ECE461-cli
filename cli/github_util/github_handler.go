@@ -40,14 +40,26 @@ func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 		if err != nil {
 			log.Panic(err)
 		}
-		contributors, _, err := client.Repositories.ListContributors(ctx, on.Owner, on.Name, nil)
-		// Can create error with contributor stats and umarshalling, not consistent
-		if err != nil {
-			log.Panic(err)
-		} else {
-			module := GitHubModule{Repo: repos, Contributors: contributors, Url: on.Url}
-			res = append(res, module)
+
+		opt := &github.ListContributorsOptions{
+			ListOptions: github.ListOptions{PerPage: 30},
 		}
+		var allContributors []*github.Contributor
+		for {
+			contributors, resp, err := client.Repositories.ListContributors(ctx, on.Owner, on.Name, opt)
+			if err != nil {
+				log.Panic(err)
+			}
+			allContributors = append(allContributors, contributors...)
+			if resp.NextPage == 0 {
+				break
+			}
+			opt.Page = resp.NextPage
+		}
+
+		// Can create error with contributor stats and umarshalling, not consistent
+		module := GitHubModule{Repo: repos, Contributors: allContributors, Url: on.Url}
+		res = append(res, module)
 
 	}
 	return res
