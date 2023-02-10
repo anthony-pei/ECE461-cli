@@ -19,7 +19,7 @@ func (g GitHubModule) GetGitHubUrl() string {
 
 func (g GitHubModule) GetLicense() string {
 	license := g.Repo.GetLicense()
-	return *license.Name
+	return *license.Key
 }
 
 func (g GitHubModule) GetOpenIssuesCount() int {
