@@ -1,7 +1,9 @@
 package metrics
 
 import (
+	"math"
 	"testing"
+	"time"
 )
 
 type MockModule struct {
@@ -11,6 +13,7 @@ type MockModule struct {
 	StargazersCount int
 	Contributors    int
 	Name            string
+	FakeIssues      []IssueNode
 }
 
 func (m MockModule) GetGitHubUrl() string {
@@ -40,6 +43,37 @@ func (m MockModule) GetName() string {
 func (m MockModule) Clone(dir string) {
 }
 
+func (m MockModule) GetLast10ClosedIssues() []IssueNode {
+	return m.FakeIssues
+}
+
+func TestResponsivness1Issue(t *testing.T) {
+	fakeIssues := []IssueNode{{ClosedAt: time.Now(), CreatedAt: time.Now().AddDate(0, 0, -1)}}
+	m := MockModule{FakeIssues: fakeIssues}
+	responsivnessMetric := ResponsiveMaintainerMetric{}
+
+	assertEquals(t, "", responsivnessMetric.CalculateScore(m), .99)
+}
+
+func TestResponsiveness0Issue(t *testing.T) {
+	fakeIssues := []IssueNode{}
+	m := MockModule{FakeIssues: fakeIssues}
+	responsivnessMetric := ResponsiveMaintainerMetric{}
+
+	assertEquals(t, "", responsivnessMetric.CalculateScore(m), 1.00)
+}
+
+func TestResponsives10Issue(t *testing.T) {
+	fakeIssues := []IssueNode{}
+	for i := 0; i < 10; i++ {
+		fakeIssues = append(fakeIssues, IssueNode{ClosedAt: time.Now(), CreatedAt: time.Now().AddDate(0, 0, -1)})
+	}
+	m := MockModule{FakeIssues: fakeIssues}
+	responsivnessMetric := ResponsiveMaintainerMetric{}
+
+	assertEquals(t, "", math.Round(responsivnessMetric.CalculateScore(m)*100)/100, .90)
+
+}
 func TestRampUpNoComments(t *testing.T) {
 	m := MockModule{}
 	rampUpMetric := RampUpMetric{}

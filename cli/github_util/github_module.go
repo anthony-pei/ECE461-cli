@@ -4,6 +4,7 @@ import (
 	"log"
 	"os/exec"
 
+	"github.com/anthony-pei/ECE461/cli/metrics"
 	"github.com/google/go-github/github"
 )
 
@@ -44,4 +45,8 @@ func (g GitHubModule) Clone(dir string) {
 	if err != nil {
 		log.Fatal(err) // Maybe no need to be Fatal?
 	}
+}
+
+func (g GitHubModule) GetLast10ClosedIssues() []metrics.IssueNode {
+	return GetLast10ClosedIssues(*g.Repo.Owner.Login, *g.Repo.Name)
 }
