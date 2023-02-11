@@ -26,7 +26,7 @@ var responsivnessMetric ResponsiveMaintainerMetric
 func (l *NetScoreMetric) CalculateScore(m Module) float64 {
 	// Object l of type license matrix and m of type module with function get_url()
 
-	fmt.Println(m.GetName())
+	//fmt.Println(m.GetName())
 	l.Correctness = correctnessMetric.CalculateScore(m)
 	l.License = licenseMetric.CalculateScore(m)
 	l.Busfactor = busfactorMetric.CalculateScore(m)
