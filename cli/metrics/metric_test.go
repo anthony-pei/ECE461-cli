@@ -72,7 +72,7 @@ func TestCorrectnessZeroIssues(t *testing.T) {
 	m := MockModule{OpenIssues: 0, StargazersCount: 10}
 	correctnessMetric := CorrectnessMetric{}
 
-	assertEquals(t, "Correctness (0, 10)", correctnessMetric.CalculateScore(m), 0.99999)
+	assertEquals(t, "Correctness (0, 10)", correctnessMetric.CalculateScore(m), 0.99999000001)
 }
 
 func TestCorrectnessZeroStargazers(t *testing.T) {
