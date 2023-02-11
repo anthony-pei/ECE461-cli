@@ -3,6 +3,7 @@ package file_handler
 import (
 	"bufio"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 
@@ -20,16 +21,32 @@ func GetOwnersNamesFromFile(filename string) []github_util.OwnerName {
 
 	scanner := bufio.NewScanner(file)
 
-	// Handle poorly formatted and malicious links
 	for scanner.Scan() {
 		link := scanner.Text()
-		parts := strings.Split(link, "/")
-		if parts[2] == "www.npmjs.com" {
-			new_link := ConvertNpmToGitHub(link, parts[len(parts)-1])
-			parts = strings.Split(new_link, "/")
+		URL, err := url.Parse(link)
+		if err != nil {
+			log.Printf("Error with URL parse: %v\n", err) // If error continue reading file
+			continue
 		}
-
-		ownerNames = append(ownerNames, github_util.OwnerName{Owner: parts[3], Name: parts[4], Url: link})
+		owner, name := "", ""
+		if URL.Host == "github.com" {
+			log.Printf("Parsing github link %v\n", link)
+			parts := strings.Split(URL.Path, "/")
+			if len(parts) != 3 {
+				log.Printf("URL.path malformed %v\n", URL.Path)
+				continue
+			} else {
+				owner, name = parts[1], parts[2]
+			}
+		} else if URL.Host == "www.npmjs.com" {
+			log.Printf("Parsing npm link %v\n", link)
+			owner, name = ConvertNpmToGitHub(URL.Path)
+		} else {
+			log.Printf("Unkown URL host %v\n", link)
+			continue
+		}
+		//fmt.Println(owner, name)
+		ownerNames = append(ownerNames, github_util.OwnerName{Owner: owner, Name: name, Url: link})
 	}
 	return ownerNames
 }

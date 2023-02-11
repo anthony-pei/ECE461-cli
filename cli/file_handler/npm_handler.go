@@ -5,6 +5,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
+
 	"strings"
 )
 
@@ -17,8 +19,9 @@ type NPMResponse struct {
 
 // function for npm links
 // if npmjs link, find GitHub repo. ADD message for npm modules with no GitHub repo
-func ConvertNpmToGitHub(url string, packageName string) string {
-	resp, err := http.Get("https://registry.npmjs.org/" + packageName)
+func ConvertNpmToGitHub(path string) (string, string) {
+	parts := strings.Split(path, "/")
+	resp, err := http.Get("https://registry.npmjs.org/" + parts[len(parts)-1])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,8 +36,17 @@ func ConvertNpmToGitHub(url string, packageName string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	url = npmResp.Repository.URL
-	url = "https://" + strings.Split(url, "//")[1]
-	url = url[:len(url)-4] // removes .git at the end
-	return url
+	git_url := npmResp.Repository.URL
+	URL, err := url.Parse(git_url)
+	if err != nil {
+		log.Fatalf("Error translating npm to git %v\n", err)
+	}
+
+	parts = strings.Split(URL.Path, "/")
+	if len(parts) != 3 {
+		log.Fatalf("Malformed path translating npm to git %v\n", URL.Path)
+		return "", ""
+	} else {
+		return parts[1], strings.ReplaceAll(parts[2], ".git", "")
+	}
 }
