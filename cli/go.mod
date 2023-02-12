@@ -14,11 +14,13 @@ require (
 	github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
 
 require (
+	github.com/boyter/scc v2.12.0+incompatible
 	github.com/boyter/scc/v3 v3.1.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
