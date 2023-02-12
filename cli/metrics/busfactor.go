@@ -14,6 +14,7 @@ func (l BusFactorMetric) CalculateScore(m Module) float64 {
 	log.Info("Calculating busFactor metric for module:", m.GetGitHubUrl())
 	numContributors := float64(m.GetContributorCount())
 	if numContributors == 0 {
+		log.Debugf("0 contributers for %v", m.GetGitHubUrl())
 		return 0.0
 	}
 	busFactor := 1.0 - (1.0 / numContributors)
