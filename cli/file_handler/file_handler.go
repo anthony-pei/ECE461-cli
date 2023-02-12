@@ -13,7 +13,7 @@ import (
 )
 
 func errorExit(msg string, a ...any) {
-	log.Error(msg)
+	log.Errorf(msg, a...)
 	fmt.Fprintf(os.Stderr, msg, a...)
 	os.Exit(1)
 }
@@ -33,7 +33,7 @@ func GetOwnersNamesFromFile(filename string) []github_util.OwnerName {
 		link := scanner.Text()
 		URL, err := url.Parse(link)
 		if err != nil {
-			log.Debugf("Error with URL parse: %v", err) // If error continue reading file
+			log.Errorf("Error with URL parse: %v", err) // If error continue reading file
 			continue
 		}
 		owner, name := "", ""
@@ -50,7 +50,7 @@ func GetOwnersNamesFromFile(filename string) []github_util.OwnerName {
 			log.Infof("Parsing npm link %v", link)
 			owner, name = ConvertNpmToGitHub(URL.Path)
 		} else {
-			log.Debugf("Unkown URL host %v", link)
+			log.Errorf("Unkown URL host %v", link)
 			continue
 		}
 		//fmt.Println(owner, name)
