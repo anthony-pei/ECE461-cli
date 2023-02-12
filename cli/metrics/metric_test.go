@@ -169,6 +169,28 @@ func TestLicenseDeny(t *testing.T) {
 	assertEquals(t, "", licenseMetric.CalculateScore((m2)), 0.0)
 	assertEquals(t, "", licenseMetric.CalculateScore((m3)), 0.0)
 }
+func TestNetScoreMiddle(t *testing.T) {
+	fakeIssues := []IssueNode{}
+	m := MockModule{URL: "https://github.com/anthony-pei/ECE461", License: "mit", OpenIssues: 10, StargazersCount: 10, Contributors: 10, FakeIssues: fakeIssues}
+	netScoreMetric := NetScoreMetric{}
+	assertEquals(t, "", netScoreMetric.CalculateScore(m), 0.78)
+}
+func TestNetScoreLow(t *testing.T) {
+	fakeIssues := []IssueNode{}
+	for i := 0; i < 10; i++ {
+		fakeIssues = append(fakeIssues, IssueNode{ClosedAt: time.Now(), CreatedAt: time.Now().AddDate(0, 0, -1)})
+	}
+	m := MockModule{URL: "https://github.com/cloudinary/cloudinary_npm", License: "agpl-3.0", OpenIssues: 10, StargazersCount: 0, Contributors: 0, FakeIssues: fakeIssues}
+	netScoreMetric := NetScoreMetric{}
+	assertEquals(t, "", netScoreMetric.CalculateScore(m), 0.36)
+}
+func TestNetScoreHigh(t *testing.T) {
+	fakeIssues := []IssueNode{}
+	// rampUpScore := 0.9
+	m := MockModule{URL: "https://www.npmjs.com/package/express", License: "lgpl-2.1", OpenIssues: 0, StargazersCount: 1000, Contributors: 1000, FakeIssues: fakeIssues}
+	netScoreMetric := NetScoreMetric{}
+	assertEquals(t, "", math.Round(netScoreMetric.CalculateScore(m)*100)/100, 0.90)
+}
 
 func TestNetScoreAllZero(t *testing.T) {
 	nm := NetScoreMetric{}
