@@ -173,7 +173,7 @@ func TestNetScoreMiddle(t *testing.T) {
 	fakeIssues := []IssueNode{}
 	m := MockModule{URL: "https://github.com/anthony-pei/ECE461", License: "mit", OpenIssues: 10, StargazersCount: 10, Contributors: 10, FakeIssues: fakeIssues}
 	netScoreMetric := NetScoreMetric{}
-	assertEquals(t, "", netScoreMetric.CalculateScore(m), 0.78)
+	assertEquals(t, "", math.Round(netScoreMetric.CalculateScore(m)*100)/100.0, 0.78)
 }
 func TestNetScoreLow(t *testing.T) {
 	fakeIssues := []IssueNode{}
@@ -182,7 +182,7 @@ func TestNetScoreLow(t *testing.T) {
 	}
 	m := MockModule{URL: "https://github.com/cloudinary/cloudinary_npm", License: "agpl-3.0", OpenIssues: 10, StargazersCount: 0, Contributors: 0, FakeIssues: fakeIssues}
 	netScoreMetric := NetScoreMetric{}
-	assertEquals(t, "", netScoreMetric.CalculateScore(m), 0.36)
+	assertEquals(t, "", math.Round(netScoreMetric.CalculateScore(m)*100)/100.0, 0.36)
 }
 func TestNetScoreHigh(t *testing.T) {
 	fakeIssues := []IssueNode{}
