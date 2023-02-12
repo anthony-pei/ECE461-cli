@@ -20,6 +20,5 @@ elif [[ "$1" == "test" ]]; then
   echo "$run/$passed tests passed"
   echo ${coverage:0:29}
 elif [[ -n "$1" ]]; then
-  echo "checking URL"
   cli/cli "$1"
 fi
