@@ -1,7 +1,6 @@
- #!/usr/bin/env bash
+#!/bin/bash
 
 subdir="cli"
-
 
 if [[ "$1" == "build" ]]; then
   cd "$subdir"
@@ -9,7 +8,7 @@ if [[ "$1" == "build" ]]; then
   echo "Built cli program. Type /run <replace with inputFile.txt> to run"
 elif [[ "$1" == "install" ]]; then
   cd "$subdir"
-  go build
+  go install
   echo "Installed all dependencies"
 elif [[ "$1" == "test" ]]; then
   cd "$subdir"
@@ -22,5 +21,5 @@ elif [[ "$1" == "test" ]]; then
   echo ${coverage:0:29}
 elif [[ -n "$1" ]]; then
   echo "checking URL"
-  cli "$1"
+  cli/cli "$1"
 fi
