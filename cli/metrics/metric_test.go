@@ -107,6 +107,26 @@ func TestBusFactorMoreThanOneContributor(t *testing.T) {
 	assertEquals(t, "", busfactorMetric.CalculateScore(m3), 1.0-1.0/500)
 	assertEquals(t, "", busfactorMetric.CalculateScore(m4), 1.0-1.0/1750)
 }
+func TestLicenseAccept(t *testing.T) {
+	m1 := MockModule{License: "mit"}
+	m2 := MockModule{License: "lgpl-2.1"}
+	m3 := MockModule{License: "unlicense"}
+	licenseMetric = LicenseMetric{}
+
+	assertEquals(t, "", licenseMetric.CalculateScore((m1)), 1.0)
+	assertEquals(t, "", licenseMetric.CalculateScore((m2)), 1.0)
+	assertEquals(t, "", licenseMetric.CalculateScore((m3)), 1.0)
+}
+func TestLicenseDeny(t *testing.T) {
+	m1 := MockModule{License: ""}
+	m2 := MockModule{License: "gpl-3.0"}
+	m3 := MockModule{License: "agpl-3.0"}
+	licenseMetric = LicenseMetric{}
+
+	assertEquals(t, "", licenseMetric.CalculateScore((m1)), 0.0)
+	assertEquals(t, "", licenseMetric.CalculateScore((m2)), 0.0)
+	assertEquals(t, "", licenseMetric.CalculateScore((m3)), 0.0)
+}
 func assertEquals(t *testing.T, desc string, got interface{}, want interface{}) {
 	if got != want {
 		t.Errorf("%v Got: %v (%T), Want:%v (%T)", desc, got, got, want, want)
