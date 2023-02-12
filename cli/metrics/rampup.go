@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"math"
-
 	"github.com/anthony-pei/ECE461/cli/code_analysis"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,6 +19,7 @@ func (l RampUpMetric) CalculateScore(m Module) float64 {
 	m.Clone(dir)
 
 	_, code, comments, _ := analyzeDirFunction(dir) // Returns total lines, lines of code, comments, and blank lines. Not using first and last at the moment
+
 	log.Infof("Code Lines: %v, Comment Lines: %v", code, comments)
 	code_analysis.CleanDir(dir, true)
 
