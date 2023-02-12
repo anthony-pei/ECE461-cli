@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"encoding/json"
-	"fmt"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,11 +17,11 @@ type NetScoreMetric struct {
 	Netscore       float64 `json:"net_score"`
 }
 
-var correctnessMetric CorrectnessMetric
-var licenseMetric LicenseMetric
-var busfactorMetric BusFactorMetric
-var rampUpMetric RampUpMetric
-var responsivnessMetric ResponsiveMaintainerMetric
+var correctnessMetric Metric = CorrectnessMetric{}
+var licenseMetric Metric = LicenseMetric{}
+var busfactorMetric Metric = BusFactorMetric{}
+var rampUpMetric Metric = RampUpMetric{}
+var responsivnessMetric Metric = ResponsiveMaintainerMetric{}
 
 func (l *NetScoreMetric) CalculateScore(m Module) float64 {
 	// Object l of type license matrix and m of type module with function get_url()
@@ -40,7 +40,6 @@ func (l *NetScoreMetric) CalculateScore(m Module) float64 {
 
 func (l NetScoreMetric) ToNDJson() string {
 	b, err := json.Marshal(l)
-	fmt.Println(l.Netscore)
 	if err != nil {
 		log.Debug("Error with NDJson conversion")
 	}

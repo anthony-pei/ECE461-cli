@@ -3,9 +3,10 @@ package file_handler
 import (
 	"encoding/json"
 	"io"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
+
+	log "github.com/sirupsen/logrus"
 
 	"strings"
 )
@@ -39,12 +40,12 @@ func ConvertNpmToGitHub(path string) (string, string) {
 	git_url := npmResp.Repository.URL
 	URL, err := url.Parse(git_url)
 	if err != nil {
-		log.Debug("Error translating npm to git %v\n", err)
+		log.Debugf("Error translating npm to git %v\n", err)
 	}
 
 	parts = strings.Split(URL.Path, "/")
 	if len(parts) != 3 {
-		log.Debug("Malformed path translating npm to git %v\n", URL.Path)
+		log.Debugf("Malformed path translating npm to git %v\n", URL.Path)
 		return "", ""
 	} else {
 		return parts[1], strings.ReplaceAll(parts[2], ".git", "")
