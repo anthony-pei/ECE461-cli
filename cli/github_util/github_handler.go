@@ -2,8 +2,10 @@ package github_util
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
+	"fmt"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/anthony-pei/ECE461/cli/metrics"
 	"github.com/google/go-github/github"
@@ -16,16 +18,22 @@ type OwnerName struct {
 	Url   string
 }
 
+func errorExit(msg string, a ...any) {
+	log.Errorf(msg, a...)
+	fmt.Fprintf(os.Stderr, msg, a...)
+	os.Exit(1)
+}
+
 // TODO: Handle recieving errors from github API, no need to panic move on to next OwnerName (log issue)
 func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 	res := []metrics.Module{}
 	ctx := context.Background()
 	token, has_token := os.LookupEnv("GITHUB_TOKEN")
 	if !has_token {
-		log.Debug("GITHUB_TOKEN variable not in environment, please set it in enviroment variables")
+		errorExit("GITHUB_TOKEN variable not in environment, please set it in enviroment variables")
 	}
 	if len(token) == 0 {
-		log.Debug("GITHUB_TOKEN variable is present, but not set to a value")
+		errorExit("GITHUB_TOKEN variable is present, but not set to a value")
 	}
 
 	ts := oauth2.StaticTokenSource(
