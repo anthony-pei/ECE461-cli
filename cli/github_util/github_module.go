@@ -20,6 +20,10 @@ func (g GitHubModule) GetGitHubUrl() string {
 
 func (g GitHubModule) GetLicense() string {
 	license := g.Repo.GetLicense()
+	if license == nil {
+		log.Println("Unable to retrieve license")
+		return ""
+	}
 	return *license.Key
 }
 
