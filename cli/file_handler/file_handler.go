@@ -2,6 +2,7 @@ package file_handler
 
 import (
 	"bufio"
+	"fmt"
 	"net/url"
 	"os"
 	"strings"
@@ -11,10 +12,16 @@ import (
 	"github.com/anthony-pei/ECE461/cli/github_util"
 )
 
+func errorExit(msg string, a ...any) {
+	log.Error(msg)
+	fmt.Fprintf(os.Stderr, msg, a...)
+	os.Exit(1)
+}
+
 func GetOwnersNamesFromFile(filename string) []github_util.OwnerName {
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Debug("Error getting name from file")
+		errorExit("Error getting module names from file, Err: %v", err)
 	}
 	defer file.Close()
 
