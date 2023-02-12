@@ -2,7 +2,7 @@ package file_handler
 
 import (
 	"bufio"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/url"
 	"os"
 	"strings"
@@ -13,7 +13,7 @@ import (
 func GetOwnersNamesFromFile(filename string) []github_util.OwnerName {
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		log.Debug("Error getting name from file")
 	}
 	defer file.Close()
 
@@ -25,24 +25,24 @@ func GetOwnersNamesFromFile(filename string) []github_util.OwnerName {
 		link := scanner.Text()
 		URL, err := url.Parse(link)
 		if err != nil {
-			log.Printf("Error with URL parse: %v\n", err) // If error continue reading file
+			log.Debug("Error with URL parse: %v\n", err) // If error continue reading file
 			continue
 		}
 		owner, name := "", ""
 		if URL.Host == "github.com" {
-			log.Printf("Parsing github link %v\n", link)
+			log.Info("Parsing github link %v\n", link)
 			parts := strings.Split(URL.Path, "/")
 			if len(parts) != 3 {
-				log.Printf("URL.path malformed %v\n", URL.Path)
+				log.Info("URL.path malformed %v\n", URL.Path)
 				continue
 			} else {
 				owner, name = parts[1], parts[2]
 			}
 		} else if URL.Host == "www.npmjs.com" {
-			log.Printf("Parsing npm link %v\n", link)
+			log.Info("Parsing npm link %v\n", link)
 			owner, name = ConvertNpmToGitHub(URL.Path)
 		} else {
-			log.Printf("Unkown URL host %v\n", link)
+			log.Debug("Unkown URL host %v\n", link)
 			continue
 		}
 		//fmt.Println(owner, name)

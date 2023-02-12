@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 	"math"
 )
 
@@ -18,7 +18,7 @@ func (l ResponsiveMaintainerMetric) CalculateScore(m Module) float64 {
 		score -= 0.01 * (issue.ClosedAt.Sub(issue.CreatedAt)).Hours() / 24
 	}
 	score = math.Max(0, score)
-	log.Println("Calculating license metric for module:", m.GetGitHubUrl())
+	log.Info("Calculating license metric for module:", m.GetGitHubUrl())
 
 	return score
 }

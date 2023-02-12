@@ -2,7 +2,7 @@ package github_util
 
 import (
 	"context"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/anthony-pei/ECE461/cli/metrics"
@@ -22,10 +22,10 @@ func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 	ctx := context.Background()
 	token, has_token := os.LookupEnv("GITHUB_TOKEN")
 	if !has_token {
-		log.Fatal("GITHUB_TOKEN variable not in environment, please set it in enviroment variables")
+		log.Debug("GITHUB_TOKEN variable not in environment, please set it in enviroment variables")
 	}
 	if len(token) == 0 {
-		log.Fatal("GITHUB_TOKEN variable is present, but not set to a value")
+		log.Debug("GITHUB_TOKEN variable is present, but not set to a value")
 	}
 
 	ts := oauth2.StaticTokenSource(
@@ -38,7 +38,7 @@ func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 	for _, on := range ownerNames {
 		repos, _, err := client.Repositories.Get(ctx, on.Owner, on.Name)
 		if err != nil {
-			log.Panic(err)
+			log.Debug(err)
 		}
 
 		opt := &github.ListContributorsOptions{
@@ -48,7 +48,7 @@ func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 		for {
 			contributors, resp, err := client.Repositories.ListContributors(ctx, on.Owner, on.Name, opt)
 			if err != nil {
-				log.Panic(err)
+				log.Debug(err)
 			}
 			allContributors = append(allContributors, contributors...)
 			if resp.NextPage == 0 {

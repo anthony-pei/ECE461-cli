@@ -3,7 +3,7 @@ package file_handler
 import (
 	"encoding/json"
 	"io"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
 
@@ -23,28 +23,28 @@ func ConvertNpmToGitHub(path string) (string, string) {
 	parts := strings.Split(path, "/")
 	resp, err := http.Get("https://registry.npmjs.org/" + parts[len(parts)-1])
 	if err != nil {
-		log.Fatal(err)
+		log.Debug(err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Debug(err)
 	}
 
 	var npmResp NPMResponse
 	err = json.Unmarshal(body, &npmResp)
 	if err != nil {
-		log.Fatal(err)
+		log.Debug(err)
 	}
 	git_url := npmResp.Repository.URL
 	URL, err := url.Parse(git_url)
 	if err != nil {
-		log.Fatalf("Error translating npm to git %v\n", err)
+		log.Debug("Error translating npm to git %v\n", err)
 	}
 
 	parts = strings.Split(URL.Path, "/")
 	if len(parts) != 3 {
-		log.Fatalf("Malformed path translating npm to git %v\n", URL.Path)
+		log.Debug("Malformed path translating npm to git %v\n", URL.Path)
 		return "", ""
 	} else {
 		return parts[1], strings.ReplaceAll(parts[2], ".git", "")

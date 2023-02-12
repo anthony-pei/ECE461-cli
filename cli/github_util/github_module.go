@@ -1,7 +1,7 @@
 package github_util
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os/exec"
 
 	"github.com/anthony-pei/ECE461/cli/metrics"
@@ -43,7 +43,7 @@ func (g GitHubModule) Clone(dir string) {
 	cmd := exec.Command("git", "clone", *g.Repo.CloneURL, dir)
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal(err) // Maybe no need to be Fatal?
+		log.Debug("Error Cloning.") // Maybe no need to be Fatal?
 	}
 }
 
