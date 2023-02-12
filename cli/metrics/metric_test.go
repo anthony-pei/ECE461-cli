@@ -60,7 +60,7 @@ func TestResponsivness1Issue(t *testing.T) {
 	m := MockModule{FakeIssues: fakeIssues}
 	responsivnessMetric := ResponsiveMaintainerMetric{}
 
-	assertEquals(t, "", responsivnessMetric.CalculateScore(m), .99)
+	assertEquals(t, "", math.Round(responsivnessMetric.CalculateScore(m)*100)/100.0, .99)
 }
 
 func TestResponsiveness0Issue(t *testing.T) {
