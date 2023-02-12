@@ -129,25 +129,36 @@ func TestCorrectnessEqualStargazersOpenIssues(t *testing.T) {
 
 	assertEquals(t, "Correctness (0, 10)", correctnessMetric.CalculateScore(m), 0.0)
 }
-func TestBusFactorZeroOrOneCOntributor(t *testing.T) {
-	m1 := MockModule{Contributors: 0}
-	m2 := MockModule{Contributors: 1}
+func TestBusFactorOneContributors(t *testing.T) {
+	m := MockModule{Contributors: 1}
 	busfactorMetric = BusFactorMetric{}
-
-	assertEquals(t, "", busfactorMetric.CalculateScore(m1), 0.0)
-	assertEquals(t, "", busfactorMetric.CalculateScore(m2), 0.0)
+	assertEquals(t, "", busfactorMetric.CalculateScore(m), 0.0)
 }
-func TestBusFactorMoreThanOneContributor(t *testing.T) {
-	m1 := MockModule{Contributors: 2}
-	m2 := MockModule{Contributors: 10}
-	m3 := MockModule{Contributors: 500}
-	m4 := MockModule{Contributors: 1750}
+func TestBusFactorZeroContributors(t *testing.T) {
+	m := MockModule{Contributors: 0}
 	busfactorMetric = BusFactorMetric{}
+	assertEquals(t, "", busfactorMetric.CalculateScore(m), 0.0)
+}
+func TestBusFactorTwoContributors(t *testing.T) {
+	m := MockModule{Contributors: 2}
+	busfactorMetric = BusFactorMetric{}
+	assertEquals(t, "", busfactorMetric.CalculateScore(m), 0.5)
 
-	assertEquals(t, "", busfactorMetric.CalculateScore(m1), 0.5)
-	assertEquals(t, "", busfactorMetric.CalculateScore(m2), 0.9)
-	assertEquals(t, "", busfactorMetric.CalculateScore(m3), 1.0-1.0/500)
-	assertEquals(t, "", busfactorMetric.CalculateScore(m4), 1.0-1.0/1750)
+}
+func TestBusFactorTenContributors(t *testing.T) {
+	m := MockModule{Contributors: 10}
+	busfactorMetric = BusFactorMetric{}
+	assertEquals(t, "", busfactorMetric.CalculateScore(m), 0.9)
+}
+func TestBusFactor500Contributors(t *testing.T) {
+	m := MockModule{Contributors: 500}
+	busfactorMetric = BusFactorMetric{}
+	assertEquals(t, "", busfactorMetric.CalculateScore(m), 1.0-1.0/500)
+}
+func TestBusFactor1750Contributors(t *testing.T) {
+	m := MockModule{Contributors: 1750}
+	busfactorMetric = BusFactorMetric{}
+	assertEquals(t, "", busfactorMetric.CalculateScore(m), 1.0-1.0/1750)
 }
 func TestLicenseAccept(t *testing.T) {
 	m1 := MockModule{License: "mit"}
