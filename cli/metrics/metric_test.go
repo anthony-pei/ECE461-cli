@@ -14,7 +14,6 @@ type MockModule struct {
 	Contributors    int
 	Name            string
 	FakeIssues      []IssueNode
-	RampUp          float64
 }
 
 func (m MockModule) GetGitHubUrl() string {
