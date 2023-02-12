@@ -2,10 +2,11 @@ package metrics
 
 import (
 	"io/ioutil"
-	log "github.com/sirupsen/logrus"
 	"math"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/boyter/scc/v3/processor"
 )
@@ -23,7 +24,7 @@ func (l RampUpMetric) CalculateScore(m Module) float64 {
 	m.Clone(dir)
 	processor.ProcessConstants()                    // Required to load the language information and need only be done once
 	_, code, comments, _ := analyzeDirFunction(dir) // Returns total lines, lines of code, comments, and blank lines. Not using first and last at the moment
-	log.Info("Code Lines: %v, Comment Lines: %v", code, comments)
+	log.Infof("Code Lines: %v, Comment Lines: %v", code, comments)
 	cleanDir(dir, true)
 
 	if code == 0 {
@@ -53,7 +54,6 @@ func analyzeDir(dir string) (int64, int64, int64, int64) {
 			total_lines, code_lines, comment_lines, blank_lines = analyzeDir(new_path)
 		} else {
 			total_lines, code_lines, comment_lines, blank_lines = analyze(new_path)
-			//log.Printf("%v: Total Lines: %v, Code Lines: %v, Comment Lines: %v, Blank Lines: %v\n", item.Name(), total_lines, code_lines, comment_lines, blank_lines)
 		}
 		dir_lines += total_lines
 		dir_code += code_lines
