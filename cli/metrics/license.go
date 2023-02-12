@@ -1,6 +1,6 @@
 package metrics
 
-import "fmt"
+import "log"
 
 type LicenseMetric struct {
 	licenseKey string
@@ -8,7 +8,7 @@ type LicenseMetric struct {
 
 func (l LicenseMetric) CalculateScore(m Module) float64 {
 	// Object l of type license matrix and m of type module with function get_url()\
-	fmt.Println("Calculating license metric for module:", m.GetGitHubUrl())
+	log.Println("Calculating license metric for module:", m.GetGitHubUrl())
 	score := 0.0
 	key := m.GetLicense()
 	if len(key) == 0 {
