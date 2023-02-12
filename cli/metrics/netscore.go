@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"encoding/json"
-	"fmt"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -40,7 +40,6 @@ func (l *NetScoreMetric) CalculateScore(m Module) float64 {
 
 func (l NetScoreMetric) ToNDJson() string {
 	b, err := json.Marshal(l)
-	fmt.Println(l.Netscore)
 	if err != nil {
 		log.Debug("Error with NDJson conversion")
 	}
