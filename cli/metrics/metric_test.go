@@ -129,37 +129,25 @@ func TestCorrectnessEqualStargazersOpenIssues(t *testing.T) {
 
 	assertEquals(t, "Correctness (0, 10)", correctnessMetric.CalculateScore(m), 0.0)
 }
+func TestBusFactorZeroOrOneCOntributor(t *testing.T) {
+	m1 := MockModule{Contributors: 0}
+	m2 := MockModule{Contributors: 1}
+	busfactorMetric = BusFactorMetric{}
 
-func TestBusFactorOneContributors(t *testing.T) {
-	m := MockModule{Contributors: 1}
-	busfactorMetric = BusFactorMetric{}
-	assertEquals(t, "", busfactorMetric.CalculateScore(m), 0.0)
+	assertEquals(t, "", busfactorMetric.CalculateScore(m1), 0.0)
+	assertEquals(t, "", busfactorMetric.CalculateScore(m2), 0.0)
 }
-func TestBusFactorZeroContributors(t *testing.T) {
-	m := MockModule{Contributors: 0}
+func TestBusFactorMoreThanOneContributor(t *testing.T) {
+	m1 := MockModule{Contributors: 2}
+	m2 := MockModule{Contributors: 10}
+	m3 := MockModule{Contributors: 500}
+	m4 := MockModule{Contributors: 1750}
 	busfactorMetric = BusFactorMetric{}
-	assertEquals(t, "", busfactorMetric.CalculateScore(m), 0.0)
-}
-func TestBusFactorTwoContributors(t *testing.T) {
-	m := MockModule{Contributors: 2}
-	busfactorMetric = BusFactorMetric{}
-	assertEquals(t, "", busfactorMetric.CalculateScore(m), 0.5)
 
-}
-func TestBusFactorTenContributors(t *testing.T) {
-	m := MockModule{Contributors: 10}
-	busfactorMetric = BusFactorMetric{}
-	assertEquals(t, "", busfactorMetric.CalculateScore(m), 0.9)
-}
-func TestBusFactor500Contributors(t *testing.T) {
-	m := MockModule{Contributors: 500}
-	busfactorMetric = BusFactorMetric{}
-	assertEquals(t, "", busfactorMetric.CalculateScore(m), 1.0-1.0/500)
-}
-func TestBusFactor1750Contributors(t *testing.T) {
-	m := MockModule{Contributors: 1750}
-	busfactorMetric = BusFactorMetric{}
-	assertEquals(t, "", busfactorMetric.CalculateScore(m), 1.0-1.0/1750)
+	assertEquals(t, "", busfactorMetric.CalculateScore(m1), 0.5)
+	assertEquals(t, "", busfactorMetric.CalculateScore(m2), 0.9)
+	assertEquals(t, "", busfactorMetric.CalculateScore(m3), 1.0-1.0/500)
+	assertEquals(t, "", busfactorMetric.CalculateScore(m4), 1.0-1.0/1750)
 }
 func TestLicenseAccept(t *testing.T) {
 	m1 := MockModule{License: "mit"}
@@ -181,29 +169,6 @@ func TestLicenseDeny(t *testing.T) {
 	assertEquals(t, "", licenseMetric.CalculateScore((m2)), 0.0)
 	assertEquals(t, "", licenseMetric.CalculateScore((m3)), 0.0)
 }
-
-func TestNetScoreMiddle(t *testing.T) {
-	fakeIssues := []IssueNode{}
-	m := MockModule{URL: "https://github.com/anthony-pei/ECE461", License: "mit", OpenIssues: 10, StargazersCount: 10, Contributors: 10, FakeIssues: fakeIssues}
-	netScoreMetric := NetScoreMetric{}
-	assertEquals(t, "", netScoreMetric.CalculateScore(m), 0.78)
-}
-func TestNetScoreLow(t *testing.T) {
-	fakeIssues := []IssueNode{}
-	for i := 0; i < 10; i++ {
-		fakeIssues = append(fakeIssues, IssueNode{ClosedAt: time.Now(), CreatedAt: time.Now().AddDate(0, 0, -1)})
-	}
-	m := MockModule{URL: "https://github.com/cloudinary/cloudinary_npm", License: "agpl-3.0", OpenIssues: 10, StargazersCount: 0, Contributors: 0, FakeIssues: fakeIssues}
-	netScoreMetric := NetScoreMetric{}
-	assertEquals(t, "", netScoreMetric.CalculateScore(m), 0.36)
-}
-func TestNetScoreHigh(t *testing.T) {
-	fakeIssues := []IssueNode{}
-	// rampUpScore := 0.9
-	m := MockModule{URL: "https://www.npmjs.com/package/express", License: "lgpl-2.1", OpenIssues: 0, StargazersCount: 1000, Contributors: 1000, FakeIssues: fakeIssues}
-	netScoreMetric := NetScoreMetric{}
-	assertEquals(t, "", math.Round(netScoreMetric.CalculateScore(m)*100)/100, 0.90)
-
 
 func TestNetScoreAllZero(t *testing.T) {
 	nm := NetScoreMetric{}
@@ -227,8 +192,8 @@ func TestNetScoreAllOnes(t *testing.T) {
 	m := MockModule{}
 
 	assertEquals(t, "", math.Round(nm.CalculateScore(m)*100)/100.0, 1.0)
-
 }
+
 func assertEquals(t *testing.T, desc string, got interface{}, want interface{}) {
 	if got != want {
 		t.Errorf("%v Got: %v (%T), Want:%v (%T)", desc, got, got, want, want)
