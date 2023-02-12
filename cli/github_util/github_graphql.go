@@ -2,7 +2,7 @@ package github_util
 
 import (
 	"context"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/anthony-pei/ECE461/cli/metrics"
@@ -34,7 +34,7 @@ func GetLast10ClosedIssues(owner string, name string) []metrics.IssueNode {
 
 	err := client.Query(context.Background(), &query, variables)
 	if err != nil {
-		log.Fatal(err)
+		log.Debug(err)
 	}
 
 	IssueNodes := []metrics.IssueNode{}

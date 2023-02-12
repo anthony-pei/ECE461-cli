@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"io/ioutil"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"math"
 	"os"
 	"path/filepath"
@@ -17,13 +17,13 @@ var analyzeDirFunction = analyzeDir
 
 func (l RampUpMetric) CalculateScore(m Module) float64 {
 	// Object l of type license matrix and m of type module with function get_url()
-	log.Println("Calculating ramp up metric for module:", m.GetGitHubUrl())
+	log.Info("Calculating ramp up metric for module:", m.GetGitHubUrl())
 	dir := "temp"
 	cleanDir(dir, false)
 	m.Clone(dir)
 	processor.ProcessConstants()                    // Required to load the language information and need only be done once
 	_, code, comments, _ := analyzeDirFunction(dir) // Returns total lines, lines of code, comments, and blank lines. Not using first and last at the moment
-	log.Printf("Code Lines: %v, Comment Lines: %v", code, comments)
+	log.Info("Code Lines: %v, Comment Lines: %v", code, comments)
 	cleanDir(dir, true)
 
 	if code == 0 {
@@ -39,7 +39,7 @@ func cleanDir(dir string, failOnError bool) {
 	err := os.RemoveAll(dir)
 
 	if failOnError && (err != nil) {
-		log.Fatal(err)
+		log.Debug("Error removing directory.")
 	}
 }
 
