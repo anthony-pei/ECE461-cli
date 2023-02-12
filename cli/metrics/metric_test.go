@@ -6,6 +6,14 @@ import (
 	"time"
 )
 
+type MockMetric struct {
+	score float64
+}
+
+func (mm MockMetric) CalculateScore(m Module) float64 {
+	return mm.score
+}
+
 type MockModule struct {
 	URL             string
 	License         string
@@ -160,6 +168,30 @@ func TestLicenseDeny(t *testing.T) {
 	assertEquals(t, "", licenseMetric.CalculateScore((m1)), 0.0)
 	assertEquals(t, "", licenseMetric.CalculateScore((m2)), 0.0)
 	assertEquals(t, "", licenseMetric.CalculateScore((m3)), 0.0)
+}
+
+func TestNetScoreAllZero(t *testing.T) {
+	nm := NetScoreMetric{}
+	correctnessMetric = MockMetric{}
+	licenseMetric = MockMetric{}
+	busfactorMetric = MockMetric{}
+	rampUpMetric = MockMetric{}
+	responsivnessMetric = MockMetric{}
+	m := MockModule{}
+
+	assertEquals(t, "", nm.CalculateScore(m), 0.0)
+}
+
+func TestNetScoreAllOnes(t *testing.T) {
+	nm := NetScoreMetric{}
+	correctnessMetric = MockMetric{score: 1.0}
+	licenseMetric = MockMetric{score: 1.0}
+	busfactorMetric = MockMetric{score: 1.0}
+	rampUpMetric = MockMetric{score: 1.0}
+	responsivnessMetric = MockMetric{score: 1.0}
+	m := MockModule{}
+
+	assertEquals(t, "", math.Round(nm.CalculateScore(m)*100)/100.0, 1.0)
 }
 func assertEquals(t *testing.T, desc string, got interface{}, want interface{}) {
 	if got != want {
