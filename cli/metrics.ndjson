@@ -1,0 +1,5 @@
+{"metric":"BUS_FACTOR_SCORE", "api":"rest", "filepath":"cli/github_util/github_handler.go", "line":57}
+{"metric":"CORRECTNESS_SCORE", "api":"rest", "filepath":"cli/github_util/github_handler.go", "line":47}
+{"metric":"LICENSE_SCORE", "api":"rest", "filepath":"cli/github_util/github_handler.go", "line":47}
+{"metric":"RESPONSIVENESS_SCORE", "api":"graphql", "filepath":"cli/github_util/github_graphql.go", "line":35}
+{"metric":"RAMP_UP_SCORE", "api":"clone", "filepath":"cli/github_util/github_module.go", "line":47}
