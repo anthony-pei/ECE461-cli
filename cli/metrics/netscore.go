@@ -8,13 +8,13 @@ import (
 
 // If more metric scores are needed, add score into this struct, and call appropriate methods in CalculateScore()
 type NetScoreMetric struct {
-	URL            string  `json:"url"`
-	Correctness    float64 `json:"correctness"`
-	License        float64 `json:"license"`
-	Busfactor      float64 `json:"busfactor"`
-	Rampup         float64 `json:"ramp_up"`
-	Responsiveness float64 `json:"responsive_maintainer"`
-	Netscore       float64 `json:"net_score"`
+	URL            string  `json:"URL"`
+	Correctness    float64 `json:"CORRECTNESS_SCORE"`
+	License        float64 `json:"LICENSE_SCORE"`
+	Busfactor      float64 `json:"BUS_FACTOR_SCORE"`
+	Rampup         float64 `json:"RAMP_UP_SCORE"`
+	Responsiveness float64 `json:"RESPONSIVE_MAINTAINER_SCORE"`
+	Netscore       float64 `json:"NET_SCORE"`
 }
 
 var correctnessMetric Metric = CorrectnessMetric{}
